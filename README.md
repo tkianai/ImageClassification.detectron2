@@ -26,7 +26,7 @@ This provides a convenient way to initialize backbone in detectron2.
 3. Run: `python train_net_builtin.py --num-gpus <gpu number> --config-file configs/<your config file>`. For example: `sh scripts/train_net_builtin.sh`
 
 
-- Trained with pytorch formal imagenet trainer
+- Trained with pytorch formal imagenet trainer [**Recommend**]
 
 1. Read carefully with some arguments in `train_net.py`
 2. Run: `sh /scripts/train_net.sh`

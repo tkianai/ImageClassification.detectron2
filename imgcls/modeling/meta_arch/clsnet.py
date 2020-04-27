@@ -40,7 +40,7 @@ class ClsNet(nn.Module):
 
         self.num_classes = cfg.MODEL.CLSNET.NUM_CLASSES
         self.in_features = cfg.MODEL.CLSNET.IN_FEATURES
-        self.backbone = build_backbone(cfg)
+        self.bottom_up = build_backbone(cfg)
         self.criterion = nn.CrossEntropyLoss()
         
         self.register_buffer("pixel_mean", torch.Tensor(cfg.MODEL.PIXEL_MEAN).view(-1, 1, 1))
@@ -63,7 +63,7 @@ class ClsNet(nn.Module):
         images = self.preprocess_image(batched_inputs)
         gt_labels = [x['label'] for x in batched_inputs]
         gt_labels = torch.as_tensor(gt_labels, dtype=torch.long).to(self.device)
-        features = self.backbone(images.tensor)
+        features = self.bottom_up(images.tensor)
         features = [features[f] for f in self.in_features]
         
         if self.training:
@@ -79,7 +79,7 @@ class ClsNet(nn.Module):
             return processed_results
 
     def forward(self, images):
-        features = self.backbone(images)
+        features = self.bottom_up(images)
         return features["linear"]
 
 

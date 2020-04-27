@@ -212,7 +212,7 @@ def main_worker(gpu, ngpus_per_node, args, cfg):
             if args.gpu is not None:
                 # best_acc1 may be from a checkpoint from a different GPU
                 best_acc1 = best_acc1.to(args.gpu)
-            model.load_state_dict(checkpoint['state_dict'])
+            model.load_state_dict(checkpoint['model'])
             optimizer.load_state_dict(checkpoint['optimizer'])
             print("=> loaded checkpoint '{}' (epoch {})"
                   .format(args.resume, checkpoint['epoch']))
@@ -278,9 +278,11 @@ def main_worker(gpu, ngpus_per_node, args, cfg):
 
         if not args.multiprocessing_distributed or (args.multiprocessing_distributed
                                                     and args.rank % ngpus_per_node == 0):
+            
             save_checkpoint({
                 'epoch': epoch + 1,
-                'state_dict': model.state_dict(),
+                'model': model.state_dict(),
+                'matching_heuristics': True,
                 'best_acc1': best_acc1,
                 'optimizer': optimizer.state_dict(),
             }, is_best)
@@ -381,7 +383,16 @@ def validate(val_loader, model, criterion, args):
 def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
     torch.save(state, filename)
     if is_best:
-        shutil.copyfile(filename, 'model_best.pth.tar')
+        # strip 'module.'
+        from collections import OrderedDict
+        p = OrderedDict()
+        for key, value in state['model'].items():
+            if key.startswith('module.'):
+                key = key[7:]
+            p[key] = value
+        state['model'] = p
+        torch.save(state, "model_best.pth.tar")
+        # shutil.copyfile(filename, 'model_best.pth.tar')
 
 
 class AverageMeter(object):
