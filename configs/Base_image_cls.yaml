@@ -1,0 +1,28 @@
+MODEL:
+  META_ARCHITECTURE: "ClsNet"
+  BACKBONE:
+    NAME: "build_mnetv1_backbone"
+    FREEZE_AT: 0
+  MNET:
+    OUT_FEATURES: ['linear']
+    WIDTH_MULT: 0.25
+  CLSNET:
+    ENABLE: True
+    NUM_CLASSES: 1000
+    INPUT_SIZE: 224
+
+DATASETS:
+  TRAIN: ("imagenet_train", )
+  TEST: ("imagenet_val", )
+DATALOADER:
+  ASPECT_RATIO_GROUPING: False
+  NUM_WORKERS: 4
+SOLVER:
+  IMS_PER_BATCH: 512
+  BASE_LR: 0.1
+  STEPS: (150000, 180000)
+  MAX_ITER: 200000
+INPUT:
+  CROP:
+    ENABLED: True
+VERSION: 2
